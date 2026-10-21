@@ -1,5 +1,9 @@
+import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, lazyPlugins } from "vite-plus";
+
+const srcDir = fileURLToPath(new URL("./src", import.meta.url));
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -30,5 +34,15 @@ export default defineConfig({
       },
     ],
   },
-  plugins: lazyPlugins(() => [react()]),
+  plugins: lazyPlugins(() => [react(), tailwindcss()]),
+  resolve: {
+    alias: {
+      "@": srcDir,
+    },
+  },
+  test: {
+    environment: "jsdom",
+    setupFiles: ["./src/test/setup.ts"],
+    restoreMocks: true,
+  },
 });
