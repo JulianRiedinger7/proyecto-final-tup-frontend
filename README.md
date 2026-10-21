@@ -1,32 +1,42 @@
-# React + TypeScript + Vite
+## Requisitos previos
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+- Git.
+- Node.js compatible con la versión de Vite+ utilizada por el proyecto.
+- pnpm 12.14.0, según la configuración del repositorio.
 
-Currently, two official plugins are available:
+El proyecto utiliza **Vite+** como toolchain de frontend. La dependencia local `vite-plus` proporciona los comandos de desarrollo, compilación, linting, formateo y testing. No es necesario instalar globalmente la CLI `vp` para ejecutar los scripts del proyecto.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Instalación
 
-## React Compiler
+Clonar el repositorio e ingresar a la carpeta:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+git clone https://github.com/JulianRiedinger7/proyecto-final-tup-frontend.git
+cd proyecto-final-tup-frontend
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Instalar las dependencias:
+
+```bash
+pnpm install
+```
+
+## Comandos disponibles
+
+```bash
+pnpm dev           # Servidor de desarrollo
+pnpm build         # Verificación de tipos y compilación
+pnpm preview       # Vista previa del build
+pnpm lint          # Análisis estático del código
+pnpm check         # Formateo, linting y chequeos de tipos
+pnpm format        # Aplicar formato al código
+pnpm format:check  # Verificar formato sin modificar archivos
+pnpm test          # Ejecutar los tests
+pnpm test:watch    # Ejecutar tests en modo watch
+```
+
+## Variables de entorno
+
+Copiar `.env.example` a `.env` y completar las variables requeridas para el entorno local. No subir el archivo `.env` al repositorio.
+
+Las versiones de Node.js y pnpm utilizadas en el desarrollo deben respetar los requisitos declarados por las dependencias y la configuración del proyecto.
