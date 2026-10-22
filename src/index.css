@@ -180,3 +180,51 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+:root {
+  --color-surface: #141219;
+  --color-on-surface: #e6e0ea;
+  --color-on-surface-variant: #e3bdc7;
+  --color-surface-container-low: #1c1b21;
+  --color-surface-container-high: #2b2930;
+  --color-primary: #ffb0ca;
+  --color-primary-container: #ff479c;
+  --color-primary-fixed: #ffd9e3;
+  --color-secondary: #dbb8ff;
+  --color-secondary-container: #6807ba;
+  --color-secondary-fixed-dim: #dbb8ff;
+  --color-tertiary: #00dbe9;
+  --color-tertiary-container: #00a0aa;
+  --color-tertiary-fixed: #7df4ff;
+
+  --spacing-space-xs: 0.25rem;
+  --spacing-space-sm: 0.5rem;
+  --spacing-space-md: 1rem;
+  --spacing-space-lg: 1.5rem;
+  --spacing-gutter-mobile: 0.75rem;
+
+  --font-label-sm: "JetBrains Mono", monospace;
+  --font-body-md: "Plus Jakarta Sans", sans-serif;
+  --font-headline-xl-mobile: "Space Grotesk", sans-serif;
+
+  --text-label-sm: 10px;
+  --text-label-sm--line-height: 14px;
+  --text-label-sm--letter-spacing: 0.08em;
+  --text-label-sm--font-weight: 500;
+
+  --text-body-md: 15px;
+  --text-body-md--line-height: 22px;
+  --text-body-md--font-weight: 400;
+
+  --text-headline-xl-mobile: 34px;
+  --text-headline-xl-mobile--line-height: 40px;
+  --text-headline-xl-mobile--letter-spacing: -0.02em;
+  --text-headline-xl-mobile--font-weight: 700;
+}
+
+body {
+  margin: 0;
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: var(--font-body-md);
+}
