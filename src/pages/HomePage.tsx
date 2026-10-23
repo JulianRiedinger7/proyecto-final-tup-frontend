@@ -1,4 +1,4 @@
-import logo from "@/assets/CircuitoVivoLogo.png";
+import logo from "@/assets/CircuitoVivo_transparente.png";
 
 export function HomePage() {
   return (
@@ -13,18 +13,15 @@ export function HomePage() {
         <div className="relative flex items-center justify-center mb-space-lg">
           <div className="absolute inset-0 bg-gradient-to-tr from-primary-container/40 via-tertiary/20 to-secondary-container/40 rounded-full blur-2xl scale-125 animate-pulse" />
           <div className="relative p-space-xs rounded-full bg-surface-container-low/60 backdrop-blur-sm shadow-xxl">
-            <img
-              src={logo}
-              alt="Circuito Vivo"
-              className="w-[170px] h-[179px] object-contain drop-shadow-[0_0_100px_rgba(1,1,1,1)] select-none transition-transform duration-500 hover:scale-105"
-            />
+            <img src={logo} alt="Circuito Vivo" className="w-[340px] h-[358px] " />
           </div>
         </div>
-
-        <h1 className="font-headline-xl-mobile text-5xl md:text-7xl leading-tight tracking-tight font-bold !text-white">
-          Circuito Vivo
-        </h1>
-        <p>Conectá con la música, viví el show</p>
+        <p className="font-headline-xl-mobile text-3xl md:text-3xl leading-tight tracking-tight font-bold !text-white">
+          Conectá con la música,{" "}
+        </p>
+        <p className="font-headline-xl-mobile text-3xl md:text-3xl leading-tight tracking-tight font-bold !text-white">
+          viví el show
+        </p>
       </div>
     </div>
   );
