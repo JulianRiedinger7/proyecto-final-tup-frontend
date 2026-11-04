@@ -1,9 +1,14 @@
 import { listTickets, type Ticket } from "@/services/tickets";
 import { DataTable } from "@/components/ui/DataTable";
+import { Pagination } from "@/components/Pagination";
 import { useEffect, useState } from "react";
+
+const TICKETS_PER_PAGE = 10;
 
 export function TicketsPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [totalTickets, setTotalTickets] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,26 +29,37 @@ export function TicketsPage() {
   }));
 
   useEffect(() => {
+    let active = true;
+
     const fetchTickets = () => {
       setLoading(true);
       setError(null);
-      listTickets()
+      listTickets({ page: currentPage, limit: TICKETS_PER_PAGE })
         .then((response) => {
+          if (!active) return;
           if (response.code >= 400) {
             setError(response.msg);
             return;
           }
           setTickets(response.data?.items ?? []);
+          setTotalTickets(response.data?.total ?? 0);
         })
         .catch((error) => {
+          if (!active) return;
           console.error("Error al obtener tickets:", error);
           setError("No se pudieron cargar los tickets.");
         })
-        .finally(() => setLoading(false));
+        .finally(() => {
+          if (active) setLoading(false);
+        });
     };
 
     fetchTickets();
-  }, []);
+
+    return () => {
+      active = false;
+    };
+  }, [currentPage]);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
@@ -56,7 +72,7 @@ export function TicketsPage() {
         </div>
         {!loading && !error && (
           <p className="font-label-sm text-xs tracking-wide text-on-surface-variant">
-            {tickets.length} {tickets.length === 1 ? "TICKET" : "TICKETS"}
+            {totalTickets} {totalTickets === 1 ? "TICKET" : "TICKETS"}
           </p>
         )}
       </header>
@@ -75,7 +91,16 @@ export function TicketsPage() {
         </p>
       )}
       {!loading && !error && (
-        <DataTable entityName="tickets" headers={ticketHeaders} rows={ticketRows} />
+        <>
+          <DataTable entityName="tickets" headers={ticketHeaders} rows={ticketRows} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(totalTickets / TICKETS_PER_PAGE)}
+            handlePageChange={setCurrentPage}
+            label="Paginación de tickets"
+            className="mt-6"
+          />
+        </>
       )}
     </div>
   );
