@@ -40,9 +40,12 @@ export function TicketsPage() {
               className="rounded-lg border border-white/15 bg-white/5 p-4 text-white"
             >
               <p className="font-semibold">Ticket #{ticket.id}</p>
-              <p>Evento: {ticket.eventoId}</p>
+              <p>Evento: {ticket.evento.titulo}</p>
+              <p>
+                Espectador: {ticket.espectador.nombre} {ticket.espectador.apellido}
+              </p>
               <p>Código QR: {ticket.codigoQr}</p>
-              <p>Precio: {ticket.precioUnitario}</p>
+              <p>Precio: ${ticket.precioUnitario.toFixed(2)}</p>
               <p>Estado: {ticket.estado}</p>
             </li>
           ))}

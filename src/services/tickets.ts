@@ -3,21 +3,42 @@ import type { ApiResponse, PaginatedData } from "@/types/api";
 export const TICKET_ESTADOS = ["RESERVADO", "CONFIRMADO", "UTILIZADO", "CANCELADO"] as const;
 export type TicketEstado = (typeof TICKET_ESTADOS)[number];
 
+export type TicketEvento = {
+  id: number;
+  titulo: string;
+  fechaHora: string;
+  lugar: string;
+};
+
+export type TicketEspectador = {
+  id: number;
+  nombre: string;
+  apellido: string;
+};
+
 export type Ticket = {
   id: number;
-  espectadorId: number;
-  eventoId: number;
   codigoQr: string;
   precioUnitario: number;
   estado: TicketEstado;
   createdAt: string;
   fechaValidacionPuerta: string | null;
+  evento: TicketEvento;
+  espectador: TicketEspectador;
 };
+
+export type TicketSortBy =
+  | "id"
+  | "codigoQr"
+  | "precioUnitario"
+  | "estado"
+  | "createdAt"
+  | "fechaValidacionPuerta";
 
 export type TicketListParams = {
   page?: number;
   limit?: number;
-  sortBy?: keyof Ticket;
+  sortBy?: TicketSortBy;
   sortOrder?: "asc" | "desc";
 };
 
