@@ -1,10 +1,27 @@
 import { listTickets, type Ticket } from "@/services/tickets";
+import { DataTable } from "@/components/ui/DataTable";
 import { useEffect, useState } from "react";
 
 export function TicketsPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const ticketHeaders = ["Código QR", "Evento", "Espectador", "Precio", "Estado"];
+  const ticketRows = tickets.map((ticket) => ({
+    id: ticket.id,
+    values: [
+      ticket.codigoQr,
+      ticket.evento.titulo,
+      `${ticket.espectador.nombre} ${ticket.espectador.apellido}`,
+      ticket.precioUnitario.toLocaleString("es-AR", {
+        style: "currency",
+        currency: "ARS",
+        maximumFractionDigits: 0,
+      }),
+      ticket.estado,
+    ],
+  }));
 
   useEffect(() => {
     const fetchTickets = () => {
@@ -57,97 +74,8 @@ export function TicketsPage() {
           {error}
         </p>
       )}
-      {!loading && !error && tickets.length === 0 && (
-        <p className="rounded-lg border border-white/10 bg-surface-container-low px-4 py-10 text-center text-on-surface-variant">
-          No hay tickets disponibles.
-        </p>
-      )}
-      {!loading && !error && tickets.length > 0 && (
-        <div className="overflow-x-auto rounded-xl border border-white/10 bg-surface-container-low shadow-2xl shadow-black/20">
-          <table className="w-full min-w-[760px] border-collapse text-left">
-            <thead className="bg-white/[0.03]">
-              <tr className="border-b border-white/10">
-                <th
-                  scope="col"
-                  className="px-5 py-4 font-label-sm text-[10px] tracking-[0.14em] text-on-surface-variant uppercase"
-                >
-                  Ticket
-                </th>
-                <th
-                  scope="col"
-                  className="px-5 py-4 font-label-sm text-[10px] tracking-[0.14em] text-on-surface-variant uppercase"
-                >
-                  Evento
-                </th>
-                <th
-                  scope="col"
-                  className="px-5 py-4 font-label-sm text-[10px] tracking-[0.14em] text-on-surface-variant uppercase"
-                >
-                  Espectador
-                </th>
-                <th
-                  scope="col"
-                  className="px-5 py-4 font-label-sm text-[10px] tracking-[0.14em] text-on-surface-variant uppercase"
-                >
-                  Precio
-                </th>
-                <th
-                  scope="col"
-                  className="px-5 py-4 font-label-sm text-[10px] tracking-[0.14em] text-on-surface-variant uppercase"
-                >
-                  Estado
-                </th>
-                <th
-                  scope="col"
-                  className="px-5 py-4 text-right font-label-sm text-[10px] tracking-[0.14em] text-on-surface-variant uppercase"
-                >
-                  Acción
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/[0.07]">
-              {tickets.map((ticket) => (
-                <tr key={ticket.id} className="transition-colors hover:bg-white/[0.025]">
-                  <td className="px-5 py-4">
-                    <p className="font-label-sm text-sm text-white">#{ticket.id}</p>
-                    <p className="mt-1 font-label-sm text-xs text-on-surface-variant">
-                      {ticket.codigoQr}
-                    </p>
-                  </td>
-                  <td className="px-5 py-4 text-sm font-medium text-white">
-                    {ticket.evento.titulo}
-                  </td>
-                  <td className="px-5 py-4 text-sm text-on-surface">
-                    {ticket.espectador.nombre} {ticket.espectador.apellido}
-                  </td>
-                  <td className="px-5 py-4 font-label-sm text-sm text-white">
-                    {ticket.precioUnitario.toLocaleString("es-AR", {
-                      style: "currency",
-                      currency: "ARS",
-                      maximumFractionDigits: 0,
-                    })}
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="inline-flex rounded-full border border-primary/25 bg-primary/10 px-2.5 py-1 font-label-sm text-[10px] tracking-wide text-primary">
-                      {ticket.estado}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-right">
-                    <button
-                      type="button"
-                      disabled
-                      aria-label={`Ver detalle del ticket ${ticket.id}`}
-                      title="Disponible próximamente"
-                      className="cursor-not-allowed rounded-md border border-white/10 px-3 py-2 text-xs font-semibold text-on-surface-variant/60"
-                    >
-                      Ver detalle
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {!loading && !error && (
+        <DataTable entityName="tickets" headers={ticketHeaders} rows={ticketRows} />
       )}
     </div>
   );
