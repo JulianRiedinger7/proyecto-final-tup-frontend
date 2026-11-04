@@ -1,14 +1,14 @@
 import { listTickets, type Ticket } from "@/services/tickets";
 import { DataTable } from "@/components/ui/DataTable";
+import { PageSizeSelector } from "@/components/ui/PageSizeSelector";
 import { Pagination } from "@/components/Pagination";
 import { useEffect, useState } from "react";
-
-const TICKETS_PER_PAGE = 10;
 
 export function TicketsPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [totalTickets, setTotalTickets] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,7 +34,7 @@ export function TicketsPage() {
     const fetchTickets = () => {
       setLoading(true);
       setError(null);
-      listTickets({ page: currentPage, limit: TICKETS_PER_PAGE })
+      listTickets({ page: currentPage, limit: pageSize })
         .then((response) => {
           if (!active) return;
           if (response.code >= 400) {
@@ -59,7 +59,7 @@ export function TicketsPage() {
     return () => {
       active = false;
     };
-  }, [currentPage]);
+  }, [currentPage, pageSize]);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
@@ -70,11 +70,20 @@ export function TicketsPage() {
           </p>
           <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Tickets</h1>
         </div>
-        {!loading && !error && (
-          <p className="font-label-sm text-xs tracking-wide text-on-surface-variant">
-            {totalTickets} {totalTickets === 1 ? "TICKET" : "TICKETS"}
-          </p>
-        )}
+        <div className="flex flex-wrap items-center gap-4">
+          {!loading && !error && (
+            <p className="font-label-sm text-xs tracking-wide text-on-surface-variant">
+              {totalTickets} {totalTickets === 1 ? "TICKET" : "TICKETS"}
+            </p>
+          )}
+          <PageSizeSelector
+            value={pageSize}
+            onChange={(newPageSize) => {
+              setPageSize(newPageSize);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
       </header>
 
       {loading && (
@@ -95,7 +104,7 @@ export function TicketsPage() {
           <DataTable entityName="tickets" headers={ticketHeaders} rows={ticketRows} />
           <Pagination
             currentPage={currentPage}
-            totalPages={Math.ceil(totalTickets / TICKETS_PER_PAGE)}
+            totalPages={Math.ceil(totalTickets / pageSize)}
             handlePageChange={setCurrentPage}
             label="Paginación de tickets"
             className="mt-6"
