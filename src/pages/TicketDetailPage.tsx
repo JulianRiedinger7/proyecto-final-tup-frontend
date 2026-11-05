@@ -17,7 +17,10 @@ const estadoLabels: Record<TicketEstado, string> = {
 };
 
 const inputClassName =
-  "mt-1.5 w-full rounded-md border border-white/15 bg-surface-container-high px-3 py-2 text-sm text-white outline-none focus:border-primary disabled:opacity-70";
+  "mt-1.5 w-full rounded-md border border-white/15 bg-surface-container-high px-3 py-2 text-sm text-white outline-none focus:border-primary disabled:cursor-not-allowed disabled:border-white/10 disabled:bg-surface-container-low disabled:text-on-surface-variant disabled:opacity-60";
+
+const editableInputClassName =
+  "border-primary/70 bg-primary/10 ring-1 ring-primary/25 disabled:cursor-default disabled:border-primary/70 disabled:bg-primary/10 disabled:text-white disabled:opacity-100";
 
 function formatDate(value: string | null) {
   if (!value) return "Sin registrar";
@@ -261,9 +264,16 @@ export function TicketDetailPage() {
           </label>
 
           <label className="text-xs text-on-surface-variant">
-            Estado
+            <span className="flex items-center justify-between">
+              Estado
+              {editing && (
+                <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-medium text-primary">
+                  Editable
+                </span>
+              )}
+            </span>
             <select
-              className={inputClassName}
+              className={`${inputClassName} ${editing ? editableInputClassName : ""}`}
               value={estado}
               disabled={!editing || saving}
               onChange={(event) => {
@@ -324,35 +334,44 @@ export function TicketDetailPage() {
             <input className={inputClassName} value={formatDate(ticket.createdAt)} disabled />
           </label>
 
-          <div className="text-xs text-on-surface-variant sm:col-span-2 lg:col-span-1">
-            <label htmlFor="validation-date">Validación en puerta</label>
+          <div
+            className={`text-xs text-on-surface-variant sm:col-span-2 lg:col-span-1 ${
+              editing ? "rounded-lg border border-primary/30 bg-primary/5 p-3" : ""
+            }`}
+          >
+            <label htmlFor="validation-date" className="flex items-center justify-between">
+              Validación en puerta
+              {editing && (
+                <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-medium text-primary">
+                  Editable
+                </span>
+              )}
+            </label>
             <input
               id="validation-date"
-              className={inputClassName}
+              className={`${inputClassName} ${editing ? editableInputClassName : ""}`}
               value={formatDate(validationDate)}
               disabled
             />
             {editing && (
-              <button
-                type="button"
-                onClick={registerValidationNow}
-                disabled={saving}
-                className="mt-2 text-xs font-medium text-primary underline-offset-4 hover:underline disabled:opacity-50"
-              >
-                {updatedFields.fechaValidacionPuerta
-                  ? "Actualizar fecha a ahora"
-                  : "Registrar fecha actual"}
-              </button>
+              <>
+                <p className="mt-2 text-[11px] text-on-surface-variant">
+                  Se registrará la fecha y hora actuales.
+                </p>
+                <button
+                  type="button"
+                  onClick={registerValidationNow}
+                  disabled={saving}
+                  className="mt-2 rounded-md border border-primary/50 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
+                >
+                  {updatedFields.fechaValidacionPuerta
+                    ? "Actualizar fecha a ahora"
+                    : "Registrar fecha actual"}
+                </button>
+              </>
             )}
           </div>
         </div>
-
-        {editing && (
-          <p className="border-t border-white/10 px-5 py-3 text-xs text-on-surface-variant">
-            Los cambios se aplicarán al guardar. Las transiciones de estado no permitidas serán
-            rechazadas por el servidor.
-          </p>
-        )}
       </section>
     </section>
   );
