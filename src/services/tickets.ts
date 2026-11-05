@@ -27,6 +27,8 @@ export type Ticket = {
   espectador: TicketEspectador;
 };
 
+export type PatchTicketPayload = Partial<Pick<Ticket, "estado" | "fechaValidacionPuerta">>;
+
 export type TicketSortBy =
   | "id"
   | "codigoQr"
@@ -70,5 +72,31 @@ export async function getTicket(id: number): Promise<ApiResponse<Ticket>> {
   } catch (error) {
     console.error("Error al obtener ticket:", error);
     return { msg: "Error al obtener ticket", code: 500 };
+  }
+}
+
+export async function patchTicket(
+  id: number,
+  updatedFields: PatchTicketPayload,
+): Promise<ApiResponse<Ticket>> {
+  try {
+    const payload: PatchTicketPayload = {};
+    if (updatedFields.estado !== undefined) payload.estado = updatedFields.estado;
+    if (updatedFields.fechaValidacionPuerta !== undefined) {
+      payload.fechaValidacionPuerta = updatedFields.fechaValidacionPuerta;
+    }
+
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/tickets/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error al actualizar ticket:", error);
+    return { msg: "Error al actualizar ticket", code: 500 };
   }
 }
