@@ -5,6 +5,7 @@ import { RegisterPage } from "../pages/RegisterPage";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { LoginPage } from "@/pages/LoginPage";
 import { TicketsPage } from "@/pages/TicketsPage";
+import { TicketDetailPage } from "@/pages/TicketDetailPage";
 
 export function App() {
   return (
@@ -14,6 +15,7 @@ export function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="registro" element={<RegisterPage />} />
         <Route path="tickets" element={<TicketsPage />} />
+        <Route path="tickets/:ticketId" element={<TicketDetailPage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />
