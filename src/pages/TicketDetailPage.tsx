@@ -1,4 +1,11 @@
-import { getTicket, TICKET_ESTADOS, type Ticket, type TicketEstado } from "@/services/tickets";
+import {
+  getTicket,
+  type PatchTicketPayload,
+  TICKET_ESTADOS,
+  type Ticket,
+  type TicketEstado,
+  patchTicket,
+} from "@/services/tickets";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 
@@ -32,10 +39,11 @@ export function TicketDetailPage() {
   const { ticketId } = useParams<{ ticketId: string }>();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [estado, setEstado] = useState<TicketEstado>("RESERVADO");
-  const [precio, setPrecio] = useState("");
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [updatedFields, setUpdatedFields] = useState<PatchTicketPayload>({});
 
   useEffect(() => {
     let active = true;
@@ -69,7 +77,7 @@ export function TicketDetailPage() {
 
           setTicket(response.data);
           setEstado(response.data.estado);
-          setPrecio(String(response.data.precioUnitario));
+          setUpdatedFields({});
         })
         .catch((loadError) => {
           if (!active) return;
@@ -91,8 +99,72 @@ export function TicketDetailPage() {
   function cancelEditing() {
     if (!ticket) return;
     setEstado(ticket.estado);
-    setPrecio(String(ticket.precioUnitario));
+    setUpdatedFields({});
+    setError(null);
     setEditing(false);
+  }
+
+  function startEditing() {
+    if (!ticket) return;
+    setEstado(ticket.estado);
+    setUpdatedFields({});
+    setError(null);
+    setEditing(true);
+  }
+
+  function handleEstadoChange(nextEstado: TicketEstado) {
+    setEstado(nextEstado);
+    setError(null);
+    setUpdatedFields((previous) => {
+      const nextFields = { ...previous };
+      if (nextEstado === ticket?.estado) {
+        delete nextFields.estado;
+      } else {
+        nextFields.estado = nextEstado;
+      }
+      return nextFields;
+    });
+  }
+
+  function registerValidationNow() {
+    setUpdatedFields((previous) => ({
+      ...previous,
+      fechaValidacionPuerta: new Date().toISOString(),
+    }));
+    setError(null);
+  }
+
+  async function handleSaveChanges() {
+    if (!ticket || saving) return;
+    if (Object.keys(updatedFields).length === 0) {
+      setEditing(false);
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+    try {
+      const response = await patchTicket(ticket.id, updatedFields);
+      if (response.code >= 400) {
+        setError(response.msg || "No se pudo actualizar el ticket.");
+        return;
+      }
+
+      if (!response.data) {
+        setError("No se pudo actualizar el ticket.");
+        return;
+      }
+
+      setTicket(response.data);
+      setEstado(response.data.estado);
+      setUpdatedFields({});
+      setEditing(false);
+    } catch (saveError) {
+      console.error("Error al guardar los cambios del ticket:", saveError);
+      setError("No se pudo actualizar el ticket.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (loading) {
@@ -103,7 +175,7 @@ export function TicketDetailPage() {
     );
   }
 
-  if (error || !ticket) {
+  if (!ticket) {
     return (
       <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
         <Link to="/tickets" className="text-sm text-primary hover:underline">
@@ -120,6 +192,7 @@ export function TicketDetailPage() {
   }
 
   const spectator = `${ticket.espectador.nombre} ${ticket.espectador.apellido}`.trim();
+  const validationDate = updatedFields.fechaValidacionPuerta ?? ticket.fechaValidacionPuerta;
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
@@ -138,23 +211,43 @@ export function TicketDetailPage() {
           </p>
         </div>
         {editing ? (
-          <button
-            type="button"
-            onClick={cancelEditing}
-            className="rounded-md border border-white/20 px-4 py-2 text-sm text-white hover:bg-white/5"
-          >
-            Cancelar
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={cancelEditing}
+              disabled={saving}
+              className="rounded-md border border-white/20 px-4 py-2 text-sm text-white hover:bg-white/5 disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveChanges}
+              disabled={saving}
+              className="rounded-md border border-primary/60 bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90 disabled:opacity-50"
+            >
+              {saving ? "Guardando..." : "Guardar cambios"}
+            </button>
+          </div>
         ) : (
           <button
             type="button"
-            onClick={() => setEditing(true)}
+            onClick={startEditing}
             className="rounded-md border border-primary/60 px-4 py-2 text-sm text-primary hover:bg-primary/10"
           >
             Editar
           </button>
         )}
       </header>
+
+      {error && (
+        <p
+          className="mb-4 rounded-lg border border-red-400/30 bg-red-400/10 p-4 text-sm text-red-200"
+          role="alert"
+        >
+          {error}
+        </p>
+      )}
 
       <section className="overflow-hidden rounded-lg border border-white/10 bg-surface-container-low">
         <h2 className="border-b border-white/10 px-5 py-4 text-lg font-medium text-white">
@@ -172,9 +265,9 @@ export function TicketDetailPage() {
             <select
               className={inputClassName}
               value={estado}
-              disabled={!editing}
+              disabled={!editing || saving}
               onChange={(event) => {
-                if (isTicketEstado(event.target.value)) setEstado(event.target.value);
+                if (isTicketEstado(event.target.value)) handleEstadoChange(event.target.value);
               }}
             >
               {TICKET_ESTADOS.map((ticketEstado) => (
@@ -192,9 +285,8 @@ export function TicketDetailPage() {
               type="number"
               min="0"
               step="0.01"
-              value={precio}
-              disabled={!editing}
-              onChange={(event) => setPrecio(event.target.value)}
+              value={ticket.precioUnitario}
+              disabled
             />
           </label>
 
@@ -232,19 +324,33 @@ export function TicketDetailPage() {
             <input className={inputClassName} value={formatDate(ticket.createdAt)} disabled />
           </label>
 
-          <label className="text-xs text-on-surface-variant sm:col-span-2 lg:col-span-1">
-            Validación en puerta
+          <div className="text-xs text-on-surface-variant sm:col-span-2 lg:col-span-1">
+            <label htmlFor="validation-date">Validación en puerta</label>
             <input
+              id="validation-date"
               className={inputClassName}
-              value={formatDate(ticket.fechaValidacionPuerta)}
+              value={formatDate(validationDate)}
               disabled
             />
-          </label>
+            {editing && (
+              <button
+                type="button"
+                onClick={registerValidationNow}
+                disabled={saving}
+                className="mt-2 text-xs font-medium text-primary underline-offset-4 hover:underline disabled:opacity-50"
+              >
+                {updatedFields.fechaValidacionPuerta
+                  ? "Actualizar fecha a ahora"
+                  : "Registrar fecha actual"}
+              </button>
+            )}
+          </div>
         </div>
 
         {editing && (
           <p className="border-t border-white/10 px-5 py-3 text-xs text-on-surface-variant">
-            Los cambios son temporales; todavía no se envían al servidor.
+            Los cambios se aplicarán al guardar. Las transiciones de estado no permitidas serán
+            rechazadas por el servidor.
           </p>
         )}
       </section>
