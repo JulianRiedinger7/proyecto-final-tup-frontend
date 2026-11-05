@@ -1,11 +1,14 @@
+import { useNavigate } from "react-router";
+
 type DataTableProps = {
   entityName: string;
   headers: string[];
   rows: { id: string | number; values: string[] }[];
-  onViewDetail?: (id: string | number) => void;
 };
 
-export function DataTable({ entityName, headers, rows, onViewDetail }: DataTableProps) {
+export function DataTable({ entityName, headers, rows }: DataTableProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="overflow-x-auto rounded-xl border border-white/10 bg-surface-container-low shadow-2xl shadow-black/20">
       <table className="w-full min-w-[760px] border-collapse text-left">
@@ -40,10 +43,8 @@ export function DataTable({ entityName, headers, rows, onViewDetail }: DataTable
                 <td className="px-5 py-4 text-right">
                   <button
                     type="button"
-                    disabled={!onViewDetail}
-                    onClick={() => onViewDetail?.(row.id)}
+                    onClick={() => navigate(`/${entityName}/${row.id}`)}
                     aria-label={`Ver detalle del registro ${row.id}`}
-                    title={onViewDetail ? undefined : "Disponible próximamente"}
                     className="rounded-md border border-white/10 px-3 py-2 text-xs font-semibold text-on-surface-variant transition-colors enabled:hover:border-primary/50 enabled:hover:text-primary disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Ver detalle
