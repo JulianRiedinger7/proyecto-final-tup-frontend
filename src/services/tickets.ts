@@ -100,3 +100,16 @@ export async function patchTicket(
     return { msg: "Error al actualizar ticket", code: 500 };
   }
 }
+
+export async function deleteTicket(id: number): Promise<ApiResponse<Ticket>> {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/tickets/${id}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error al eliminar ticket:", error);
+    return { msg: "Error al eliminar ticket", code: 500 };
+  }
+}
