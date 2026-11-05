@@ -5,6 +5,7 @@ import {
   type Ticket,
   type TicketEstado,
   patchTicket,
+  deleteTicket,
 } from "@/services/tickets";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
@@ -170,6 +171,30 @@ export function TicketDetailPage() {
     }
   }
 
+  async function handleDeleteTicket() {
+    if (!ticket) return;
+    const confirmed = window.confirm(
+      "¿Estás seguro de que deseas eliminar este ticket? Esta acción no se puede deshacer.",
+    );
+    if (!confirmed) return;
+
+    setSaving(true);
+    setError(null);
+    try {
+      const response = await deleteTicket(ticket.id);
+      if (response.code >= 400) {
+        setError(response.msg || "No se pudo eliminar el ticket.");
+        return;
+      }
+      setTicket(null);
+    } catch (deleteError) {
+      console.error("Error al eliminar el ticket:", deleteError);
+      setError("No se pudo eliminar el ticket.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   if (loading) {
     return (
       <p className="mx-auto max-w-5xl px-4 py-12 text-on-surface-variant" role="status">
@@ -213,34 +238,45 @@ export function TicketDetailPage() {
             Información del ticket y del evento.
           </p>
         </div>
-        {editing ? (
-          <div className="flex gap-2">
+        <div className="flex gap-2">
+          {!editing && (
             <button
               type="button"
-              onClick={cancelEditing}
-              disabled={saving}
-              className="rounded-md border border-white/20 px-4 py-2 text-sm text-white hover:bg-white/5 disabled:opacity-50"
+              onClick={handleDeleteTicket}
+              className="rounded-md border border-red-400/60 bg-red-400/10 px-4 py-2 text-sm text-red-200 hover:bg-red-400/20"
             >
-              Cancelar
+              Eliminar
             </button>
+          )}
+          {editing ? (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={cancelEditing}
+                disabled={saving}
+                className="rounded-md border border-white/20 px-4 py-2 text-sm text-white hover:bg-white/5 disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveChanges}
+                disabled={saving}
+                className="rounded-md border border-primary/60 bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90 disabled:opacity-50"
+              >
+                {saving ? "Guardando..." : "Guardar cambios"}
+              </button>
+            </div>
+          ) : (
             <button
               type="button"
-              onClick={handleSaveChanges}
-              disabled={saving}
-              className="rounded-md border border-primary/60 bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90 disabled:opacity-50"
+              onClick={startEditing}
+              className="rounded-md border border-primary/60 px-4 py-2 text-sm text-primary hover:bg-primary/10"
             >
-              {saving ? "Guardando..." : "Guardar cambios"}
+              Editar
             </button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={startEditing}
-            className="rounded-md border border-primary/60 px-4 py-2 text-sm text-primary hover:bg-primary/10"
-          >
-            Editar
-          </button>
-        )}
+          )}
+        </div>
       </header>
 
       {error && (
