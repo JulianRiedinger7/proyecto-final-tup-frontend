@@ -2,6 +2,8 @@ import { listTickets, type Ticket } from "@/services/tickets";
 import { DataTable } from "@/components/ui/DataTable";
 import { PageSizeSelector } from "@/components/ui/PageSizeSelector";
 import { Pagination } from "@/components/Pagination";
+import { CreateTicketModal } from "@/features/tickets/components/CreateTicketModal";
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function TicketsPage() {
@@ -11,6 +13,9 @@ export function TicketsPage() {
   const [pageSize, setPageSize] = useState<number>(10);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+  const [reloadKey, setReloadKey] = useState<number>(0);
+  const [creationMessage, setCreationMessage] = useState<string | null>(null);
 
   const ticketHeaders = ["Código QR", "Evento", "Espectador", "Precio", "Estado"];
   const ticketRows = tickets.map((ticket) => ({
@@ -59,7 +64,14 @@ export function TicketsPage() {
     return () => {
       active = false;
     };
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, reloadKey]);
+
+  function handleTicketCreated(ticket: Ticket) {
+    setCreationMessage(
+      ticket.id ? `Ticket #${ticket.id} creado correctamente.` : "Ticket creado correctamente.",
+    );
+    setReloadKey((prev) => prev + 1);
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
@@ -83,8 +95,36 @@ export function TicketsPage() {
               setCurrentPage(1);
             }}
           />
+          <button
+            type="button"
+            onClick={() => {
+              setCreationMessage(null);
+              setIsCreateModalOpen(true);
+            }}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary-container px-4 py-2 text-sm font-semibold text-surface transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            <Plus aria-hidden="true" size={16} />
+            Nuevo ticket
+          </button>
         </div>
       </header>
+
+      {creationMessage && (
+        <div
+          className="mb-6 flex items-center justify-between gap-4 rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200"
+          role="status"
+        >
+          <p>{creationMessage}</p>
+          <button
+            type="button"
+            onClick={() => setCreationMessage(null)}
+            aria-label="Cerrar aviso"
+            className="rounded px-2 py-1 text-xs font-semibold text-emerald-100 hover:bg-emerald-400/20"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
 
       {loading && (
         <p className="py-12 text-center text-on-surface-variant" role="status">
@@ -110,6 +150,13 @@ export function TicketsPage() {
             className="mt-6"
           />
         </>
+      )}
+
+      {isCreateModalOpen && (
+        <CreateTicketModal
+          onClose={() => setIsCreateModalOpen(false)}
+          onCreated={handleTicketCreated}
+        />
       )}
     </div>
   );
