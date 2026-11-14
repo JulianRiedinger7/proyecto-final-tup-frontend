@@ -27,6 +27,11 @@ export type Ticket = {
   espectador: TicketEspectador;
 };
 
+export type CreateTicketPayload = {
+  eventoId: number;
+  espectadorId: number;
+};
+
 export type PatchTicketPayload = Partial<Pick<Ticket, "estado" | "fechaValidacionPuerta">>;
 
 export type TicketSortBy =
@@ -111,5 +116,25 @@ export async function deleteTicket(id: number): Promise<ApiResponse<Ticket>> {
   } catch (error) {
     console.error("Error al eliminar ticket:", error);
     return { msg: "Error al eliminar ticket", code: 500 };
+  }
+}
+
+export async function createTicket(payload: CreateTicketPayload): Promise<ApiResponse<Ticket>> {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/tickets`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        eventoId: payload.eventoId,
+        espectadorId: payload.espectadorId,
+      }),
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error al crear ticket:", error);
+    return { msg: "Error al crear ticket", code: 500 };
   }
 }
