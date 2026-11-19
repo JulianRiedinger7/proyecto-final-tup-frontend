@@ -14,6 +14,7 @@ export function Header() {
         <NavLink to="/" end>
           Inicio
         </NavLink>
+        <NavLink to="/eventos">Cartelera</NavLink>
         <NavLink to="/login">Ingreso</NavLink>
         <NavLink to="/registro">Registrate</NavLink>
       </nav>
