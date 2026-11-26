@@ -7,18 +7,21 @@ export function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [nombre, setNombre] = useState("");
+  const [apellido, setApellido] = useState("");
+  const [dni, setDni] = useState("");
+  const [telefono, setTelefono] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
     if (password.length < 6) return setError("La contraseña debe tener al menos 6 caracteres");
     if (password !== confirm) return setError("Las contraseñas no coinciden");
 
-    const res = register(nombre, email, password);
+    const res = await register(nombre, apellido, dni, telefono, email, password);
     if (res.ok) navigate("/");
     else setError(res.error ?? "Error");
   }
@@ -35,6 +38,29 @@ export function RegisterPage() {
           placeholder="Nombre"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
+          className={input}
+        />
+        <input
+          required
+          placeholder="Apellido"
+          value={apellido}
+          onChange={(e) => setApellido(e.target.value)}
+          className={input}
+        />
+        <input
+          required
+          inputMode="numeric"
+          placeholder="DNI"
+          value={dni}
+          onChange={(e) => setDni(e.target.value)}
+          className={input}
+        />
+        <input
+          type="tel"
+          required
+          placeholder="Teléfono"
+          value={telefono}
+          onChange={(e) => setTelefono(e.target.value)}
           className={input}
         />
         <input

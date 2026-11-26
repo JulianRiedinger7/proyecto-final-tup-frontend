@@ -31,7 +31,7 @@ export function Header() {
 
         {user && (
           <div className="header-user-row">
-            <span> {user.nombre}</span>
+            <button>{user.nombre}</button>
             <button
               type="button"
               onClick={() => {

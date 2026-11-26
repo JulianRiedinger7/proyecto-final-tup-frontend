@@ -1,7 +1,12 @@
 import { useState, type ReactNode } from "react";
 import { AuthContext, type User, type Result } from "./AuthContext";
 
-type StoredUser = User & { password: string };
+type StoredUser = User & {
+  apellido: string;
+  dni: string;
+  telefono: string;
+  password: string;
+};
 
 const USERS_KEY = "cv_users";
 const SESSION_KEY = "cv_session";
@@ -23,7 +28,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(SESSION_KEY, JSON.stringify(u));
   }
 
-  function register(nombre: string, email: string, password: string): Result {
+  async function register(
+    nombre: string,
+    apellido: string,
+    dni: string,
+    telefono: string,
+    email: string,
+    password: string,
+  ): Promise<Result> {
     const users = read<StoredUser[]>(USERS_KEY, []);
     const mail = email.trim().toLowerCase();
 
@@ -34,11 +46,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const nuevo: StoredUser = {
       id: crypto.randomUUID(),
       nombre: nombre.trim(),
+      apellido: apellido.trim(),
+      dni: dni.trim(),
+      telefono: telefono.trim(),
       email: mail,
       password,
     };
     localStorage.setItem(USERS_KEY, JSON.stringify([...users, nuevo]));
-    startSession({ id: nuevo.id, nombre: nuevo.nombre, email: nuevo.email });
+    startSession({
+      id: nuevo.id,
+      nombre: nuevo.nombre,
+      email: nuevo.email,
+      espectadorId: nuevo.espectadorId,
+    });
     return { ok: true };
   }
 
@@ -49,8 +69,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (!found) return { ok: false, error: "Email o contraseña incorrectos" };
 
-    startSession({ id: found.id, nombre: found.nombre, email: found.email });
+    startSession({
+      id: found.id,
+      nombre: found.nombre,
+      email: found.email,
+      espectadorId: found.espectadorId,
+    });
     return { ok: true };
+  }
+
+  function linkEspectador(id: number) {
+    if (!user) return;
+
+    const updated: User = { ...user, espectadorId: id };
+    startSession(updated);
+
+    const users = read<StoredUser[]>(USERS_KEY, []);
+    const index = users.findIndex((u) => u.id === user.id);
+    if (index === -1) return;
+
+    users[index] = { ...users[index], espectadorId: id };
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
   }
 
   function logout() {
@@ -59,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, register, login, logout }}>
+    <AuthContext.Provider value={{ user, register, login, logout, linkEspectador }}>
       {children}
     </AuthContext.Provider>
   );
