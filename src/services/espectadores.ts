@@ -40,6 +40,37 @@ export async function listEspectadores(
   }
 }
 
+export async function getEspectador(id: number): Promise<ApiResponse<Espectador>> {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/espectadores/${id}`);
+    return await res.json();
+  } catch (error) {
+    console.error("Error al obtener espectador:", error);
+    return { msg: "Error al obtener espectador", code: 500 };
+  }
+}
+
+export type PatchEspectadorPayload = Partial<CreateEspectadorPayload>;
+
+export async function patchEspectador(
+  id: number,
+  updatedFields: PatchEspectadorPayload,
+): Promise<ApiResponse<Espectador>> {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/espectadores/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedFields),
+    });
+    return await res.json();
+  } catch (error) {
+    console.error("Error al actualizar espectador:", error);
+    return { msg: "Error al actualizar espectador", code: 500 };
+  }
+}
+
 export async function createEspectador(
   payload: CreateEspectadorPayload,
 ): Promise<ApiResponse<Espectador>> {
