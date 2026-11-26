@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { AuthContext, type User, type Result } from "./AuthContext";
+import { createEspectador } from "@/services/espectadores";
 
 type StoredUser = User & {
   apellido: string;
@@ -43,6 +44,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { ok: false, error: "Ya existe una cuenta con ese email" };
     }
 
+    const response = await createEspectador({
+      nombre: nombre.trim(),
+      apellido: apellido.trim(),
+      email: mail,
+      dni: dni.trim(),
+      telefono: telefono.trim(),
+    });
+
+    if (response.code >= 400 || !response.data?.id) {
+      return { ok: false, error: response.msg };
+    }
+
     const nuevo: StoredUser = {
       id: crypto.randomUUID(),
       nombre: nombre.trim(),
@@ -51,13 +64,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       telefono: telefono.trim(),
       email: mail,
       password,
+      espectadorId: response.data.id,
     };
     localStorage.setItem(USERS_KEY, JSON.stringify([...users, nuevo]));
     startSession({
       id: nuevo.id,
       nombre: nuevo.nombre,
       email: nuevo.email,
-      espectadorId: nuevo.espectadorId,
+      espectadorId: response.data.id,
     });
     return { ok: true };
   }

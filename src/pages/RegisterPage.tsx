@@ -22,7 +22,7 @@ export function RegisterPage() {
     if (password !== confirm) return setError("Las contraseñas no coinciden");
 
     const res = await register(nombre, apellido, dni, telefono, email, password);
-    if (res.ok) navigate("/");
+    if (res.ok) void navigate("/");
     else setError(res.error ?? "Error");
   }
 
