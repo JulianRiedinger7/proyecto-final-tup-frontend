@@ -42,3 +42,24 @@
 .drawer-nav a.active {
   color: var(--color-primary);
 }
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.header-user-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.header-user-row button {
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+}
