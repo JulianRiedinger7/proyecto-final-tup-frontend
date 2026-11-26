@@ -31,7 +31,9 @@ export function Header() {
 
         {user && (
           <div className="header-user-row">
-            <button>{user.nombre}</button>
+            <button>
+              <Link to="/perfil">{user.nombre}</Link>
+            </button>
             <button
               type="button"
               onClick={() => {
