@@ -50,6 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email: mail,
       dni: dni.trim(),
       telefono: telefono.trim(),
+      createdAt: new Date(),
+      isActive: true,
     });
 
     if (response.code >= 400 || !response.data?.id) {

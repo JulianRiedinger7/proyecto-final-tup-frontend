@@ -150,6 +150,8 @@ export function PerfilEspectadorPage() {
       email: user?.email ?? "",
       dni: dni.trim(),
       telefono: telefono.trim(),
+      createdAt: new Date(),
+      isActive: true,
     });
     setSubmitting(false);
 

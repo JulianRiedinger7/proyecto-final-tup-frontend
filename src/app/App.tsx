@@ -9,6 +9,7 @@ import { TicketDetailPage } from "@/pages/TicketDetailPage";
 import { EventosPage } from "@/pages/EventosPage";
 import { EventoDetailPage, EventoFormPage } from "@/pages/EventoPages";
 import { PerfilEspectadorPage } from "@/pages/PerfilEspectadorPage";
+import { EspectadoresDetailPage } from "@/pages/EspectadoresDetailPage";
 
 export function App() {
   return (
@@ -23,6 +24,8 @@ export function App() {
         <Route path="tickets" element={<TicketsPage />} />
         <Route path="tickets/:ticketId" element={<TicketDetailPage />} />
         <Route path="perfil" element={<PerfilEspectadorPage />} />
+        <Route path="espectadores" element={<EspectadoresDetailPage />} />
+        <Route path="espectadores/:espectadorId" element={<EspectadoresDetailPage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />
