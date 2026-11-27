@@ -23,7 +23,7 @@ const inputClassName =
 const editableInputClassName =
   "border-primary/70 bg-primary/10 ring-1 ring-primary/25 disabled:cursor-default disabled:border-primary/70 disabled:bg-primary/10 disabled:text-white disabled:opacity-100";
 
-function formatDate(value: string | null) {
+export function formatDate(value: string | null) {
   if (!value) return "Sin registrar";
 
   const date = new Date(value);

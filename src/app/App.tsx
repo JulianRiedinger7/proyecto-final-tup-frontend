@@ -25,6 +25,7 @@ export function App() {
         <Route path="tickets/:ticketId" element={<TicketDetailPage />} />
         <Route path="perfil" element={<PerfilEspectadorPage />} />
         <Route path="espectadores" element={<EspectadoresDetailPage />} />
+        <Route path="espectadores/:espectadorId" element={<EspectadoresDetailPage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

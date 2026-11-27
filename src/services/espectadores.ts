@@ -7,6 +7,8 @@ export type Espectador = {
   email: string;
   dni: string;
   telefono: string;
+  createdAt: string;
+  isActive: boolean;
 };
 
 export type CreateEspectadorPayload = {
